@@ -2,52 +2,124 @@
 # - Use toupper to make this specification not sensitive to capitalization
 # - Set names of cards using package level option
 
-build_deck <- function(suits = c("s", "c", "d", "h"),
-                       face_cards = c("j", "q", "k"),
+build_deck <- function(suits = c(spades = "s",
+                                 clubs = "c",
+                                 diamonds = "d",
+                                 hearts = "h"),
+                       face_cards = c(jack = "j", queen = "q", king = "k"),
                        ace = "a",
                        num_cards = 2:10) {
 
-  card_vals <- c(num_cards, ace, face_cards)
+  # suits <- toupper(suits)
+  # face_cards <- toupper(suits)
+  # ace <- toupper(ace)
+
+  card_vals <- c(num_cards, face_cards, ace)
   suit_sets <- lapply(suits, \(x) paste(card_vals, x, sep = ""))
-  deck <- unlist(suit_sets)
+  deck <- unname(unlist(suit_sets))
 
   out <- structure(deck,
                    suits = suits, face_cards = face_cards,
                    ace = ace, num_cards = num_cards)
-  return(deck)
+  return(out)
 }
 
-build_card <- function(str,
-                       deck_format = build_deck()) {
-  card <- match.arg(str, choices = deck_format)
-  card_face_to_num <- face_to_chip(card)
+# Helper for check_card_correct_format to use values with regex
+get_attr_keys <- function(x, attr_name) {
+  attr_format <- attr(x, attr_name)
+  paste(attr_format, collapse = "")
+}
 
-  suits <- attr(deck_format, "suits")
-  suits_str <- paste(suits, collapse = "")
-  card_match_regex <- paste0("^(1[01]|[1-9])[", suits_str, "]$")
+# Check if card format is correct
+check_card_correct_format <- function(
+    card,
+    deck_format = build_deck()) {
 
-  card_correct_format <- grepl(card_match_regex, card_face_to_num)
+  card_str <- match.arg(card, choices = deck_format)
+
+  suit_keys <- get_attr_keys(deck_format, "suits")
+  facecard_keys <- get_attr_keys(deck_format, "face_cards")
+  ace_key <- attr(deck_format, "ace")
+
+  card_match_regex <- paste0(
+    "^([1-9]|10|[",
+    facecard_keys,
+    ace_key,
+    "])[", suit_keys, "]$")
+
+  card_correct_format <- grepl(card_match_regex, card)
   if (!card_correct_format)
-    cli::cli_abort("Provide a card {.var str} of correct format")
+    cli::cli_abort("Provide a card {.var card} of correct format")
 
-
+  return(invisible())
 }
+
+# Transform face cards and ace to numeric chip value
+trans_face <- function(x) gsub("[jqk]", "10", x)
+trans_ace <- function(x) gsub("a", "11", x)
 
 face_to_chip <- function(card, face_to_chip_map = list(jqk = 10, a = 11)) {
-  browser()
-
-  trans_face <- function(x) gsub("[jqk]", "10", x)
-  trans_ace <- function(x) gsub("a", "11", x)
-
   out <- trans_ace(trans_face(card))
   return(out)
 }
 
-assign_suit <- function(x, suit) {
-  attr(x, "suit") <- suit
-  return(x)
+chip_value <- function(card, keep_classes = TRUE) {
+  card_num <- face_to_chip(card)
+  digit <- as.numeric(gsub("\\D", "", card_num))
+  if (!keep_classes) return(digit)
+
+  classes <- class(card)
+  classes <- classes[classes != "character"]
+  classes <- c(classes, "numeric")
+  out <- structure(digit, class = classes)
+  return(out)
 }
 
-spades <- function(x, regex = "s$") {
+even_odd <- function(card) {
 
+  args <- as.list(environment())
+  do.call(check_card_correct_format, args)
+
+  digit_or_ace <- grepl("^(\\d+|a)", card)
+  if (!digit_or_ace) return(NULL)
+
+  card <- trans_ace(card)
+  card_num <- chip_value(card)
+  if (card_num %% 2 == 0)
+    return("even")
+  return("odd")
+}
+
+suit_of_card <- function(card,
+                 deck_format = build_deck()) {
+
+  args <- as.list(environment())
+  do.call(check_card_correct_format, args)
+
+  suit_format <- attr(deck_format, "suits")
+  suit_keys <- get_attr_keys(deck_format, "suits")
+  card_suit_key <- gsub(paste0("[^", suit_keys, "]"), "", card)
+
+  suit_of_card <- names(suit_format)[suit_format == card_suit_key]
+  return(suit_of_card)
+}
+
+build_card <- function(card,
+                       deck_format = build_deck()) {
+
+  args <- as.list(environment())
+  do.call(check_card_correct_format, args)
+
+  card %>%
+    add_class(class_name = even_odd(.)) %>%
+    add_class(class_name = suit_of_card(.)) %>%
+    chip_value()
+}
+
+build_cards <- function(cards,
+                        deck_format = build_deck()) {
+  # browser()
+  # if (length(cards == 1)) return(build_card(cards))
+
+  return(sapply(cards, build_card, simplify = FALSE))
 }
