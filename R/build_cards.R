@@ -2,6 +2,7 @@
 # - Use toupper to make this specification not sensitive to capitalization
 # - Set names of cards using package level option
 
+#' @export
 build_deck <- function(suits = c(spades = "s",
                                  clubs = "c",
                                  diamonds = "d",
@@ -24,6 +25,7 @@ build_deck <- function(suits = c(spades = "s",
   return(out)
 }
 
+#' @export
 build_card <- function(str,
                        deck_format = build_deck()) {
 
@@ -37,6 +39,7 @@ build_card <- function(str,
   structure(card, class = c("card", "list"))
 }
 
+#' @export
 build_card_set <- function(cards,
                         deck_format = build_deck()) {
   # browser()
@@ -103,6 +106,7 @@ debuff.card_set <- function(x, debuff = NULL) {
             class_name = "card_set")
 }
 
+#' @export
 even_odd_face <- function(card) {
 
   args <- as.list(environment())
@@ -118,6 +122,7 @@ even_odd_face <- function(card) {
   return("odd")
 }
 
+#' @export
 suit_of_card <- function(card,
                          deck_format = build_deck()) {
 

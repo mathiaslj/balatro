@@ -1,8 +1,10 @@
+#' @export
 balatro_score <- function(chips = 10, mult = 4) {
   vals <- as.list(environment())
   structure(vals, class = "balatro_score")
 }
 
+#' @export
 calc_balatro_score <- function(balatro_score) {
   as.numeric(balatro_score$chips * balatro_score$mult)
 }

@@ -1,5 +1,6 @@
 # Return function of cards that take a set of cards and return the value
 # it adds to chips, multp or multx
+#' @export
 score_fun <- function(x, score_type, card_type = NULL) {
   if (missing(x))
     cli::cli_abort("{.var x} is missing with no default")
@@ -14,16 +15,19 @@ score_fun <- function(x, score_type, card_type = NULL) {
 }
 
 # Chips
+#' @export
 chips <- function(x, card_type = NULL, foil = FALSE) {
   score_fun(x, "chips")
 }
 
 # Mult plus
+#' @export
 multp <- function(x, card_type = NULL) {
   score_fun(x, "multp", card_type = card_type)
 }
 
 # Mult x
+#' @export
 multx <- function(x, card_type = NULL) {
   score_fun(x, "multx", card_type = card_type)
 }

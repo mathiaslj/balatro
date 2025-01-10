@@ -7,6 +7,13 @@
 \description{
 Depending on your suit of jokers, level of hand and cards, calculate the score you will get
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://mathiaslj.github.io/balatro/}
+}
+
+}
 \author{
 \strong{Maintainer}: Mathias Lerbech Jeppesen \email{mathiasljeppesen@outlook.com}
 
