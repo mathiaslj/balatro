@@ -1,6 +1,8 @@
+
+
 add_card_score <- function(x, balatro_score, debuff = NULL) {
   if (is.null(debuff)) {
-    score <- sum(unlist(x))
+    score <- sum(sapply(x, \(y) y$chip_value))
     balatro_score$chips <- balatro_score$chips + score
     return(balatro_score)
   }

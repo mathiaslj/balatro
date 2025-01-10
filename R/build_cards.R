@@ -24,86 +24,57 @@ build_deck <- function(suits = c(spades = "s",
   return(out)
 }
 
-build_card <- function(card,
+build_card <- function(str,
                        deck_format = build_deck()) {
 
-  args <- as.list(environment())
-  do.call(check_card_correct_format, args)
+  check_card_format(card = str, deck_format = deck_format)
 
-  card %>%
-    add_class(class_name = even_odd_face(.)) %>%
-    add_class(class_name = suit_of_card(.)) %>%
-    chip_value()
+  card <- list(
+    chip_value = chip_value(str),
+    eof = even_odd_face(str),
+    suit = suit_of_card(str))
+
+  structure(card, class = c("card", "list"))
 }
 
-build_cards <- function(cards,
+build_card_set <- function(cards,
                         deck_format = build_deck()) {
   # browser()
   # if (length(cards == 1)) return(build_card(cards))
 
-  return(sapply(cards, build_card, simplify = FALSE))
-}
-
-# Helper for check_card_correct_format to use values with regex
-get_attr_keys <- function(x, attr_name) {
-  attr_format <- attr(x, attr_name)
-  paste(attr_format, collapse = "")
-}
-
-# Check if card format is correct
-check_card_correct_format <- function(
-    card,
-    deck_format = build_deck()) {
-
-  card_str <- match.arg(card, choices = deck_format)
-
-  suit_keys <- get_attr_keys(deck_format, "suits")
-  facecard_keys <- get_attr_keys(deck_format, "face_cards")
-  ace_key <- attr(deck_format, "ace")
-
-  card_match_regex <- paste0(
-    "^([1-9]|10|[",
-    facecard_keys,
-    ace_key,
-    "])[", suit_keys, "]$")
-
-  card_correct_format <- grepl(card_match_regex, card)
-  if (!card_correct_format)
-    cli::cli_abort("Provide a card {.var card} of correct format")
-
-  return(invisible())
+  card_set <- sapply(cards, build_card, simplify = FALSE)
+  structure(card_set, class = c("card_set", "list"))
 }
 
 # Transform face cards and ace to numeric chip value
-trans_face <- function(x) gsub("[jqk]", "10", x)
-trans_ace <- function(x) gsub("a", "11", x)
-
-face_to_chip <- function(card, face_to_chip_map = list(jqk = 10, a = 11)) {
-  out <- trans_ace(trans_face(card))
-  return(out)
+extract_digit <- function(str) {
+  as.numeric(gsub("\\D", "", str))
 }
 
-chip_value <- function(card, keep_classes = TRUE) {
-  card_num <- face_to_chip(card)
-  digit <- as.numeric(gsub("\\D", "", card_num))
-  if (!keep_classes) return(digit)
+face_to_chip <- function(x) gsub("[jqk]", "10", x)
+ace_to_chip <- function(x) gsub("a", "11", x)
 
-  classes <- class(card)
-  classes <- classes[classes != "character"]
-  classes <- c(classes, "numeric")
-  out <- structure(digit, class = classes)
-  return(out)
+chip_value <- function(card) {
+  face_and_ace_as_num <- ace_to_chip(face_to_chip(card))
+  extract_digit(face_and_ace_as_num)
+  # if (!keep_classes) return(digit)
+  #
+  # classes <- class(card)
+  # classes <- classes[classes != "character"]
+  # classes <- c(classes, "numeric")
+  # out <- structure(digit, class = classes)
+  # return(out)
 }
 
 even_odd_face <- function(card) {
 
   args <- as.list(environment())
-  do.call(check_card_correct_format, args)
+  do.call(check_card_format, args)
 
   digit_or_ace <- grepl("^(\\d+|a)", card)
   if (!digit_or_ace) return("face")
 
-  card <- trans_ace(card)
+  card <- ace_to_chip(card)
   card_num <- chip_value(card)
   if (card_num %% 2 == 0)
     return("even")
@@ -111,10 +82,10 @@ even_odd_face <- function(card) {
 }
 
 suit_of_card <- function(card,
-                 deck_format = build_deck()) {
+                         deck_format = build_deck()) {
 
   args <- as.list(environment())
-  do.call(check_card_correct_format, args)
+  do.call(check_card_format, args)
 
   suit_format <- attr(deck_format, "suits")
   suit_keys <- get_attr_keys(deck_format, "suits")
@@ -124,7 +95,23 @@ suit_of_card <- function(card,
   return(suit_of_card)
 }
 
+#' @export
+check_type <- function(card, card_type = NULL) {
+  UseMethod("check_type")
+}
+
+#' @export
+check_type.default <- function(card, card_type = NULL) {
+  if (is.null(card_type)) return(TRUE)
+  return(card_type %in% c(card$eof, card$suit))
+}
+
+#' @export
+check_type.character <- function(card, card_type = NULL) {
+  card <- build_card(card)
+  NextMethod("check_type")
+}
+
 count_types <- function(cards, card_type = NULL) {
-  if (is.null(card_type)) return(length(cards))
-  sum(sapply(cards, \(x) inherits(x, card_type)))
+  sum(sapply(cards, \(card) check_type(card, card_type = card_type)))
 }

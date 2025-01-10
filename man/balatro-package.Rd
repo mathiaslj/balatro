@@ -2,7 +2,6 @@
 % Please edit documentation in R/balatro-package.R
 \docType{package}
 \name{balatro-package}
-\alias{balatro}
 \alias{balatro-package}
 \title{balatro: Package for calculating scores in the game Balatro}
 \description{
