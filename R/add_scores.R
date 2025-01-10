@@ -13,6 +13,11 @@ add_card_score <- function(x, balatro_score, debuff = NULL) {
 # Return function of cards that take a set of cards and return the value
 # it adds to chips, multp or multx
 score_fun <- function(x, score_type, card_type = NULL) {
+  if (missing(x))
+    cli::cli_abort("{.var x} is missing with no default")
+  if (missing(score_type))
+    cli::cli_abort("{.var score_type} is missing with no default")
+
   if (is.null(card_type)) {
     return(function(cards) add_class(x, score_type))
   }
