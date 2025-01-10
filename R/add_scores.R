@@ -1,17 +1,3 @@
-
-
-add_card_score <- function(x, balatro_score, debuff = NULL) {
-  if (is.null(debuff)) {
-    score <- sum(sapply(x, \(y) y$chip_value))
-    balatro_score$chips <- balatro_score$chips + score
-    return(balatro_score)
-  }
-
-  # lapply(x, \(card) {
-  #   if (inherits(card, debuff))
-  # })
-}
-
 # Return function of cards that take a set of cards and return the value
 # it adds to chips, multp or multx
 score_fun <- function(x, score_type, card_type = NULL) {

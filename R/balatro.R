@@ -15,10 +15,11 @@
 #' @param ... Nothing for now
 #' @param deck_format a `character`
 #'
-#' @returns
+#' @returns a `numeric` with the score
 #' @export
 #'
 #' @examples
+#' balatro(cards = c("2h", "jc"), jokers = list(multp(10)), debuff = "even")
 balatro <- function(base_score = balatro_score(), cards, jokers, debuff = NULL,
                     ...,
                     deck_format = build_deck()) {
@@ -29,9 +30,8 @@ balatro <- function(base_score = balatro_score(), cards, jokers, debuff = NULL,
   cards_chip_value <- chip_value(card_set, debuff = debuff)
   joker_vals <- lapply(jokers, \(fun) fun(card_set))
 
-  browser()
   score <- base_score
-  score$chips <- score$chips + cards_chip_value
+  score <- add_score(cards_chip_value, score)
   for (j in joker_vals) {
     score <- add_score(j, score)
   }

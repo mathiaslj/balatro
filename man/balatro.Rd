@@ -27,6 +27,12 @@ and multx functions}
 
 \item{deck_format}{a \code{character}}
 }
+\value{
+a \code{numeric} with the score
+}
 \description{
 Title
+}
+\examples{
+balatro(cards = c("2h", "jc"), jokers = list(multp(10)), debuff = "even")
 }

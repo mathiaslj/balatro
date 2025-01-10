@@ -56,13 +56,13 @@ ace_to_chip <- function(x) gsub("a", "11", x)
 
 #' @export
 chip_value <- function(x, ...) {
-  UseMethod("chip_value")
+  UseMethod("chip_value", object = x)
 }
 
 #' @export
 chip_value.default <- function(x, ...) {
   face_and_ace_as_num <- ace_to_chip(face_to_chip(x))
-  extract_digit(face_and_ace_as_num)
+  add_class(extract_digit(face_and_ace_as_num), class_name = "chips")
 }
 
 #' @export
@@ -70,12 +70,13 @@ chip_value.card <- function(x, debuff = NULL, ...) {
   card_debuffed <- check_type(x, card_type = debuff)
   if (card_debuffed) return(0)
 
-  return(x$chip_value)
+  return(add_class(x$chip_value, class_name = "chips"))
 }
 
 #' @export
 chip_value.card_set <- function(x, debuff = NULL, ...) {
-  sum(sapply(x, \(card) chip_value(card, debuff = debuff)))
+  add_class(sum(sapply(x, \(card) chip_value(card, debuff = debuff))),
+            class_name = "chips")
 }
 
 even_odd_face <- function(card) {
@@ -124,10 +125,12 @@ check_type.character <- function(card, card_type = NULL) {
   NextMethod("check_type")
 }
 
+#' @export
 count_types <- function(cards, card_type = NULL) {
   UseMethod("count_types")
 }
 
+#' @export
 count_types.default <- function(cards, card_type = NULL) {
   sum(sapply(cards, \(card) check_type(card, card_type = card_type)))
 }
