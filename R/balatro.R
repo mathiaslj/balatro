@@ -23,15 +23,18 @@ balatro <- function(base_score = balatro_score(), cards, jokers, debuff = NULL,
                     ...,
                     deck_format = build_deck()) {
   cards <- match.arg(cards, choices = deck_format, several.ok = TRUE)
+  checkmate::assert_list(jokers)
+
+  card_set <- build_card_set(cards)
+  cards_chip_value <- chip_value(card_set, debuff = debuff)
+  joker_vals <- lapply(jokers, \(fun) fun(card_set))
 
   browser()
-  bcards <- build_card_set(cards)
-  joker_vals <- lapply(jokers, \(fun) fun(bcards))
-
-  bscore <- add_card_score(bcards, base_score, debuff = debuff)
+  score <- base_score
+  score$chips <- score$chips + cards_chip_value
   for (j in joker_vals) {
-    bscore <- add_score(j, bscore)
+    score <- add_score(j, score)
   }
 
-  calc_balatro_score(bscore)
+  calc_balatro_score(score)
 }

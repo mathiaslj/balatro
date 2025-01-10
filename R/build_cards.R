@@ -54,16 +54,28 @@ extract_digit <- function(str) {
 face_to_chip <- function(x) gsub("[jqk]", "10", x)
 ace_to_chip <- function(x) gsub("a", "11", x)
 
-chip_value <- function(card) {
-  face_and_ace_as_num <- ace_to_chip(face_to_chip(card))
+#' @export
+chip_value <- function(x, ...) {
+  UseMethod("chip_value")
+}
+
+#' @export
+chip_value.default <- function(x, ...) {
+  face_and_ace_as_num <- ace_to_chip(face_to_chip(x))
   extract_digit(face_and_ace_as_num)
-  # if (!keep_classes) return(digit)
-  #
-  # classes <- class(card)
-  # classes <- classes[classes != "character"]
-  # classes <- c(classes, "numeric")
-  # out <- structure(digit, class = classes)
-  # return(out)
+}
+
+#' @export
+chip_value.card <- function(x, debuff = NULL, ...) {
+  card_debuffed <- check_type(x, card_type = debuff)
+  if (card_debuffed) return(0)
+
+  return(x$chip_value)
+}
+
+#' @export
+chip_value.card_set <- function(x, debuff = NULL, ...) {
+  sum(sapply(x, \(card) chip_value(card, debuff = debuff)))
 }
 
 even_odd_face <- function(card) {
@@ -113,5 +125,9 @@ check_type.character <- function(card, card_type = NULL) {
 }
 
 count_types <- function(cards, card_type = NULL) {
+  UseMethod("count_types")
+}
+
+count_types.default <- function(cards, card_type = NULL) {
   sum(sapply(cards, \(card) check_type(card, card_type = card_type)))
 }
