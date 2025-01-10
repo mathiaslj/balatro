@@ -66,17 +66,41 @@ chip_value.default <- function(x, ...) {
 }
 
 #' @export
-chip_value.card <- function(x, debuff = NULL, ...) {
-  card_debuffed <- check_type(x, card_type = debuff)
-  if (card_debuffed) return(0)
-
-  return(add_class(x$chip_value, class_name = "chips"))
+chip_value.card <- function(x, ...) {
+  return(x$chip_value)
 }
 
 #' @export
-chip_value.card_set <- function(x, debuff = NULL, ...) {
-  add_class(sum(sapply(x, \(card) chip_value(card, debuff = debuff))),
+chip_value.card_set <- function(x, ...) {
+  add_class(sum(sapply(x, \(card) chip_value(card))),
             class_name = "chips")
+}
+
+is_debuffed <- function(card, debuff = NULL) {
+  if (is.null(debuff)) return(FALSE)
+  check_type(card, card_type = debuff)
+}
+
+#' @export
+debuff <- function(x, debuff = NULL) {
+  UseMethod("debuff")
+}
+
+#' @export
+debuff.card <- function(x, debuff = NULL) {
+  if (is_debuffed(x, debuff = debuff)) {
+    x$chip_value <- 0
+    x$eof <- NULL
+    x$suit <- NULL
+  }
+
+  return(x)
+}
+
+#' @export
+debuff.card_set <- function(x, debuff = NULL) {
+  add_class(lapply(x, \(card) debuff(card, debuff = debuff)),
+            class_name = "card_set")
 }
 
 even_odd_face <- function(card) {

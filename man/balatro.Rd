@@ -5,23 +5,26 @@
 \title{Title}
 \usage{
 balatro(
-  base_score = balatro_score(),
   cards,
   jokers,
+  base_score = balatro_score(),
   debuff = NULL,
+  buffs = NULL,
   ...,
   deck_format = build_deck()
 )
 }
 \arguments{
-\item{base_score}{a \code{balatro_score}}
-
 \item{cards}{a \code{character} vector of card names}
 
 \item{jokers}{a \code{vector} or \code{list} of function created with chips, multp
 and multx functions}
 
+\item{base_score}{a \code{balatro_score}}
+
 \item{debuff}{a \code{character} specifying what type of cards are debuffed}
+
+\item{buffs}{like \code{joker} a collection of chips, multp or multx fx. from}
 
 \item{...}{Nothing for now}
 
