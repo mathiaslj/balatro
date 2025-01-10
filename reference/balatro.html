@@ -159,7 +159,7 @@ Fx. if you have a joker that gives mult to even cards but you have a
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Checking the value of a level 1 "flush" with no jokers</span></span></span>
 <span class="r-in"><span><span class="fu">balatro</span><span class="op">(</span>base_score <span class="op">=</span> <span class="fu">balatro_score</span><span class="op">(</span>chips <span class="op">=</span> <span class="fl">35</span>, mult <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        cards <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"qc"</span>, <span class="st">"9c"</span>, <span class="st">"8c"</span>, <span class="st">"4c"</span>, <span class="st">"2c"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in balatro_score(chips = 35, mult = 4):</span> could not find function "balatro_score"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "272"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Level 3 "three of a kind" with odd_todd joker that gives 31 chips</span></span></span>
 <span class="r-in"><span><span class="co"># for odd ranked cards and 4+ mult on 2 of the playing cards while</span></span></span>
@@ -169,7 +169,7 @@ Fx. if you have a joker that gives mult to even cards but you have a
 <span class="r-in"><span>        jokers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">chips</span><span class="op">(</span><span class="fl">31</span>, card_type <span class="op">=</span> <span class="st">"odd"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        card_buffs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">multp</span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        debuff <span class="op">=</span> <span class="st">"clubs"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in chips(31, card_type = "odd"):</span> could not find function "chips"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "1,725"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Level 14 "five of a kind" with 10s with jokers adding their bonuses</span></span></span>
 <span class="r-in"><span><span class="co"># up to 118 +mult and 1.5*2.8*2.2*3*3 Xmult. All played cards are glass</span></span></span>
@@ -179,7 +179,7 @@ Fx. if you have a joker that gives mult to even cards but you have a
 <span class="r-in"><span>        cards <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"10d"</span>, <span class="fl">4</span><span class="op">)</span>, <span class="st">"10h"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        jokers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">multp</span><span class="op">(</span><span class="fl">118</span><span class="op">)</span>, <span class="fu">multx</span><span class="op">(</span><span class="fl">1.5</span><span class="op">*</span><span class="fl">2.8</span><span class="op">*</span><span class="fl">2.2</span><span class="op">*</span><span class="fl">3</span><span class="op">*</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        card_buffs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">multx</span><span class="op">(</span><span class="fl">2</span><span class="op">^</span><span class="fl">5</span><span class="op">)</span>, <span class="fu">multx</span><span class="op">(</span><span class="fl">1.5</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in multp(118):</span> could not find function "multp"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "292,411,350"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
