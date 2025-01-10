@@ -24,6 +24,26 @@ build_deck <- function(suits = c(spades = "s",
   return(out)
 }
 
+build_card <- function(card,
+                       deck_format = build_deck()) {
+
+  args <- as.list(environment())
+  do.call(check_card_correct_format, args)
+
+  card %>%
+    add_class(class_name = even_odd_face(.)) %>%
+    add_class(class_name = suit_of_card(.)) %>%
+    chip_value()
+}
+
+build_cards <- function(cards,
+                        deck_format = build_deck()) {
+  # browser()
+  # if (length(cards == 1)) return(build_card(cards))
+
+  return(sapply(cards, build_card, simplify = FALSE))
+}
+
 # Helper for check_card_correct_format to use values with regex
 get_attr_keys <- function(x, attr_name) {
   attr_format <- attr(x, attr_name)
@@ -75,13 +95,13 @@ chip_value <- function(card, keep_classes = TRUE) {
   return(out)
 }
 
-even_odd <- function(card) {
+even_odd_face <- function(card) {
 
   args <- as.list(environment())
   do.call(check_card_correct_format, args)
 
   digit_or_ace <- grepl("^(\\d+|a)", card)
-  if (!digit_or_ace) return(NULL)
+  if (!digit_or_ace) return("face")
 
   card <- trans_ace(card)
   card_num <- chip_value(card)
@@ -104,22 +124,7 @@ suit_of_card <- function(card,
   return(suit_of_card)
 }
 
-build_card <- function(card,
-                       deck_format = build_deck()) {
-
-  args <- as.list(environment())
-  do.call(check_card_correct_format, args)
-
-  card %>%
-    add_class(class_name = even_odd(.)) %>%
-    add_class(class_name = suit_of_card(.)) %>%
-    chip_value()
-}
-
-build_cards <- function(cards,
-                        deck_format = build_deck()) {
-  # browser()
-  # if (length(cards == 1)) return(build_card(cards))
-
-  return(sapply(cards, build_card, simplify = FALSE))
+count_types <- function(cards, card_type = NULL) {
+  if (is.null(card_type)) return(length(cards))
+  sum(sapply(cards, \(x) inherits(x, card_type)))
 }

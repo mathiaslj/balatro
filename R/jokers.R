@@ -13,12 +13,6 @@ add_joker_value <- function(joker) {
 
 }
 
-build_joker <- function(val,
-                        val_type = c("chips", "multp", "multx"),
-                        card_type = NULL) {
-  val_type <- match.arg(val_type)
-
-}
 
 odd_todd <- function(cards, chips_val = 31) {
   cards <- build_cards(cards)
