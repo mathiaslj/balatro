@@ -28,6 +28,10 @@ multx <- function(x, card_type = NULL) {
   score_fun(x, "multx", card_type = card_type)
 }
 
+# eval_score_funs <- function(score_funs, cards) {
+#   lapply(score_funs, \(fun) fun(cards))
+# }
+
 #' @export
 add_score <- function(x, balatro_score) {
   UseMethod("add_score")

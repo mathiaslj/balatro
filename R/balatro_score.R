@@ -4,7 +4,7 @@ balatro_score <- function(chips = 10, mult = 4) {
 }
 
 calc_balatro_score <- function(balatro_score) {
-  balatro_score$chips * balatro_score$mult
+  as.numeric(balatro_score$chips * balatro_score$mult)
 }
 
 # balatroScore <- R6::R6Class(
@@ -16,16 +16,8 @@ calc_balatro_score <- function(balatro_score) {
 #     },
 #     chips = NULL,
 #     mult = NULL,
-#     add_chips = function(x) {
+#     add_score = function(x) {
 #       self$chips <- self$chips + x
-#       return(invisible(self))
-#     },
-#     add_mult = function(x) {
-#       self$mult <- self$mult + x
-#       return(invisible(self))
-#     },
-#     times_mult = function(x) {
-#       self$mult <- self$mult * x
 #       return(invisible(self))
 #     }
 #   ),

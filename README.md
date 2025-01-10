@@ -21,4 +21,4 @@ pak::pak("mathiaslj/balatro")
 
 ## Example
 
-No examples yet.
+See examples in `balatro` documentation.
