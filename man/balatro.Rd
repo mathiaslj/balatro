@@ -106,5 +106,6 @@ balatro(base_score = balatro_score(chips = 35, mult = 4),
         jokers = list(idol("qc"),
                       hanging_chad(),
                       walkie_talkie(),
-                      odd_todd()))
+                      odd_todd()),
+         hand_buffs = steel(2))
 }

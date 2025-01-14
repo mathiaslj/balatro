@@ -9,6 +9,10 @@
 #   multp(mult)
 # }
 
+steel <- function(n = 1) {
+  multx(1.5^n)
+}
+
 odd_todd <- function() {
   chips(31, card_trigger = "odd")
 }
