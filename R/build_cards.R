@@ -42,7 +42,8 @@ build_card <- function(str,
     eof = even_odd_face(str),
     suit = suit_of_card(str),
     chip_count = as.numeric(chips),
-    rank = rank(str))
+    rank = rank(str),
+    name = str)
 
   structure(card, class = c("card", "list"))
 }
@@ -131,7 +132,7 @@ check_type.default <- function(card, card_trigger = NULL) {
   if (is.null(card_trigger)) return(FALSE)
 
   trigger_matches_card <- any(card_trigger %in%
-    c(card$eof, card$suit, card$rank, card$position))
+    c(card$eof, card$suit, card$rank, card$position, card$name))
   return(trigger_matches_card)
 }
 
