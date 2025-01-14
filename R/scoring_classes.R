@@ -82,9 +82,15 @@ add_to_card <- function(x, ...) {
   UseMethod("add_to_card")
 }
 
+#' #' @export
+#' add_to_card.default <- function(x, trigger) {
+#'   c(x, trigger)
+#' }
+
 #' @export
-add_to_card.x <- function(x, trigger) {
+add_to_card.card <- function(x, trigger) {
   x$score <- c(x$score, list(trigger))
+  x
 }
 
 retrigger <- function(...) {
