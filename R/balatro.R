@@ -72,12 +72,12 @@
 #' # NEW EXAMPLES
 #' balatro(base_score = balatro_score(chips = 35, mult = 4),
 #'         cards = c("qc", "9c", "8c", "4c", "2c"),
-#'         jokers = list(multx(2, "9c"),
+#'         jokers = list(multx(2, "qc"),
 #'                       retrigger(2, "first")))
 #'
 #' balatro(base_score = balatro_score(chips = 35, mult = 4),
 #'         cards = c("qc", "9c", "8c", "4c", "2c"),
-#'         jokers = list(idol("9c"),
+#'         jokers = list(idol("qc"),
 #'                       hanging_chad(),
 #'                       walkie_talkie(),
 #'                       odd_todd()))
