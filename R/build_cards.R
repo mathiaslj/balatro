@@ -30,13 +30,14 @@ build_card <- function(str,
                        buff = NULL,
                        deck_format = build_deck()) {
 
-  # TODO something with buff
-
   check_card_format(str, deck_format = deck_format)
 
+  score <- list(chips(str))
+  if (!is.null(buff))
+    score <- c(score, list(buff))
+
   card <- list(
-    card = str,
-    score = list(chips(str), buff),
+    score = score,
     eof = even_odd_face(str),
     suit = suit_of_card(str))
 
@@ -128,7 +129,7 @@ check_type.character <- function(card, card_type = NULL) {
   NextMethod("check_type")
 }
 
-#' @export
-count_types <- function(cards, card_type = NULL) {
-  sum(sapply(cards, \(card) check_type(card, card_type = card_type)))
-}
+#' #' @export
+#' count_types <- function(cards, card_type = NULL) {
+#'   sum(sapply(cards, \(card) check_type(card, card_type = card_type)))
+#' }
