@@ -112,8 +112,7 @@ balatro <- function(cards,
   trig_ind <- sapply(jokers, \(x) !is.null(attr(x, "card_trigger")))
   reg_jokers <- jokers[!trig_ind]
   trigger_jokers <- jokers[trig_ind]
-  retrig_ind <- sapply(trigger_jokers, \(x) inherits(x, "retrigger"))
-  trigger_jokers_order <- c(trigger_jokers[!retrig_ind], trigger_jokers[retrig_ind])
+  trigger_jokers_order <- retrigger_to_back(trigger_jokers)
 
   n_trigger <- length(trigger_jokers_order)
   if (n_trigger > 0) {
