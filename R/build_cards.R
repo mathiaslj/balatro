@@ -52,6 +52,8 @@ card <- function(str,
 #' @export
 card_set <- function(cards,
                      deck_format = build_deck()) {
+  checkmate::assert_list(cards)
+
   card_set <- sapply(
     cards,
     \(card) {
@@ -77,7 +79,7 @@ debuff <- function(x, debuff = NULL) {
 #' @export
 debuff.card <- function(x, debuff = NULL) {
   if (is_debuffed(x, debuff = debuff)) {
-    x$score <- chips(0)
+    x$score <- list(chips(0))
     x$eof <- NULL
     x$suit <- NULL
   }

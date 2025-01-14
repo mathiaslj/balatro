@@ -15,8 +15,7 @@ balatro(
 )
 }
 \arguments{
-\item{cards}{a \code{character} vector of card names OR a \code{list} of \code{character}s
-and \code{card}s (see examples)}
+\item{cards}{a \code{list} of \code{character}s and \code{card}s (see examples)}
 
 \item{base_score}{a \code{balatro_score}}
 
@@ -76,14 +75,14 @@ Fx. if you have a joker that gives mult to even cards but you have a
 \examples{
 # Checking the value of a level 1 "flush" with no jokers
 balatro(base_score = balatro_score(chips = 35, mult = 4),
-        cards = c("qc", "9c", "8c", "4c", "2c"))
+        cards = list("qc", "9c", "8c", "4c", "2c"))
 
 # Level 3 "three of a kind" with odd_todd joker that gives 31 chips
 # for odd ranked cards and 4+ mult on 2 of the playing cards while
 # clubs are debuffed
 balatro(base_score = balatro_score(chips = 70, mult = 7),
-        cards = c("7d", "7d", "7c"),
-        jokers = list(chips(31, card_type = "odd")),
+        cards = list("7d", "7d", "7c"),
+        jokers = list(chips(31, card_trigger = "odd")),
         hand_buffs = list(multp(2*4)),
         debuff = "clubs")
 
@@ -92,13 +91,13 @@ balatro(base_score = balatro_score(chips = 70, mult = 7),
 # cards, giving 2X mult, and 3 steel cards are held in hand, each giving
 # 1.5X mult
 balatro(base_score = balatro_score(chips = 575, mult = 51),
-        cards = c(rep("10d", 4), "10h"),
+        cards = c(rep(list("10d"), 4), "10h"),
         jokers = list(multp(118), multx(1.5*2.8*2.2*3*3)),
         hand_buffs = list(multx(2^5), multx(1.5^3)))
 
 # NEW EXAMPLES
 balatro(base_score = balatro_score(chips = 35, mult = 4),
-        cards = c("qc", "9c", "8c", "4c", "2c"),
+        cards = list("qc", "9c", "8c", "4c", "2c"),
         jokers = list(multx(2, "qc"),
                       retrigger(2, "first")))
 

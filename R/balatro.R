@@ -24,8 +24,7 @@
 #' should also just be passed on in this argument
 #'
 #' @param base_score a `balatro_score`
-#' @param cards a `character` vector of card names OR a `list` of `character`s
-#' and `card`s (see examples)
+#' @param cards a `list` of `character`s and `card`s (see examples)
 #' @param jokers a `vector` or `list` of calls to `chips`, `multp`
 #' or `multx`
 #' and multx functions
@@ -50,14 +49,14 @@
 #' @examples
 #' # Checking the value of a level 1 "flush" with no jokers
 #' balatro(base_score = balatro_score(chips = 35, mult = 4),
-#'         cards = c("qc", "9c", "8c", "4c", "2c"))
+#'         cards = list("qc", "9c", "8c", "4c", "2c"))
 #'
 #' # Level 3 "three of a kind" with odd_todd joker that gives 31 chips
 #' # for odd ranked cards and 4+ mult on 2 of the playing cards while
 #' # clubs are debuffed
 #' balatro(base_score = balatro_score(chips = 70, mult = 7),
-#'         cards = c("7d", "7d", "7c"),
-#'         jokers = list(chips(31, card_type = "odd")),
+#'         cards = list("7d", "7d", "7c"),
+#'         jokers = list(chips(31, card_trigger = "odd")),
 #'         hand_buffs = list(multp(2*4)),
 #'         debuff = "clubs")
 #'
@@ -66,13 +65,13 @@
 #' # cards, giving 2X mult, and 3 steel cards are held in hand, each giving
 #' # 1.5X mult
 #' balatro(base_score = balatro_score(chips = 575, mult = 51),
-#'         cards = c(rep("10d", 4), "10h"),
+#'         cards = c(rep(list("10d"), 4), "10h"),
 #'         jokers = list(multp(118), multx(1.5*2.8*2.2*3*3)),
 #'         hand_buffs = list(multx(2^5), multx(1.5^3)))
 #'
 #' # NEW EXAMPLES
 #' balatro(base_score = balatro_score(chips = 35, mult = 4),
-#'         cards = c("qc", "9c", "8c", "4c", "2c"),
+#'         cards = list("qc", "9c", "8c", "4c", "2c"),
 #'         jokers = list(multx(2, "qc"),
 #'                       retrigger(2, "first")))
 #'
@@ -100,9 +99,7 @@ balatro <- function(cards,
     hand_buffs <- purrr::list_flatten(hand_buffs)
   }
 
-  if (!inherits(cards, c("character", "list"))) {
-    cli::cli_abort("{.arg cards} but be a character vector or a list")
-  }
+  checkmate::assert_list(cards)
   card_set <- card_set(cards)
   card_set <- debuff(card_set, debuff = debuff)
 
