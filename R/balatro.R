@@ -72,10 +72,15 @@
 #' # NEW EXAMPLES
 #' balatro(base_score = balatro_score(chips = 35, mult = 4),
 #'         cards = c("qc", "9c", "8c", "4c", "2c"),
-#'         jokers = list(retrigger(2, "first"), multp(4, c(4, 10))))
+#'         jokers = list(multx(2, "9c"),
+#'                       retrigger(2, "first")))
 #'
-#'
-#'
+#' balatro(base_score = balatro_score(chips = 35, mult = 4),
+#'         cards = c("qc", "9c", "8c", "4c", "2c"),
+#'         jokers = list(idol("9c"),
+#'                       hanging_chad(),
+#'                       walkie_talkie(),
+#'                       odd_todd()))
 balatro <- function(cards,
                     base_score = balatro_score(),
                     jokers = NULL,
@@ -84,8 +89,14 @@ balatro <- function(cards,
                     ...,
                     deck_format = build_deck()) {
   cards <- match.arg(cards, choices = deck_format, several.ok = TRUE)
-  if (!is.null(jokers)) checkmate::assert_list(jokers)
-  if (!is.null(hand_buffs)) checkmate::assert_list(hand_buffs)
+  if (!is.null(jokers)) {
+    checkmate::assert_list(jokers)
+    jokers <- purrr::list_flatten(jokers)
+  }
+  if (!is.null(hand_buffs)) {
+    checkmate::assert_list(hand_buffs)
+    hand_buffs <- purrr::list_flatten(jokers)
+  }
 
   card_set <- debuff(build_card_set(cards), debuff = debuff)
 
@@ -101,7 +112,7 @@ balatro <- function(cards,
   }
 
   card_set_scores <- sapply(card_set, \(x) x$score)
-  scores_to_add <- c(card_set_scores, list(hand_buffs), list(reg_jokers))
+  scores_to_add <- c(card_set_scores, hand_buffs, reg_jokers)
   scores_to_add_f <- Filter(\(x) !is.null(x) && length(x) > 0, scores_to_add)
 
   score <- base_score

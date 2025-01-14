@@ -9,14 +9,19 @@
 #   multp(mult)
 # }
 
-add_joker_value <- function(joker) {
-
+odd_todd <- function() {
+  chips(31, card_trigger = "odd")
 }
 
-
-odd_todd <- function(cards, chips_val = 31) {
-  cards <- build_cards(cards)
-  num_odds <- sum(sapply(cards, \(x) inherits(x, "odd")))
-  return(chips_val * num_odds)
+hanging_chad <- function() {
+  retrigger(2, "first")
 }
 
+walkie_talkie <- function() {
+  list(chips(10, card_trigger = c(4,10)),
+       multp(4, card_trigger = c(4,10)))
+}
+
+idol <- function(str) {
+  multx(2, card_trigger = str)
+}
