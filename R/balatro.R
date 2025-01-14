@@ -77,7 +77,8 @@
 #'                       retrigger(2, "first")))
 #'
 #' balatro(base_score = balatro_score(chips = 35, mult = 4),
-#'         cards = list(card("qc", buff = multx(2)), "9c", "8c", "4c", "2c"),
+#'         cards = list(card("qc", buff = list(multx(2), retrigger(1))),
+#'                      "9c", "8c", "4c", "2c"),
 #'         jokers = list(idol("qc"),
 #'                       hanging_chad(),
 #'                       walkie_talkie(),
