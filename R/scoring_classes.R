@@ -101,11 +101,7 @@ add_to_card.card <- function(x, trigger) {
   )
   if (!trigger_matches_card) return(x)
 
-  is_trigger_retrigger <- inherits(trigger, "retrigger")
-  if (is_trigger_retrigger)
-    x$score <- rep(x$score, 1 + as.numeric(trigger))
-  else
-    x$score <- c(x$score, list(trigger))
+  x$score <- c(x$score, list(trigger))
 
   return(x)
 }
@@ -116,4 +112,31 @@ add_to_card.card_set <- function(x, trigger) {
             class_name = "card_set")
 }
 
+#' @export
+resolve_retriggers <- function(x) {
+  UseMethod("resolve_retriggers")
+}
 
+#' @export
+resolve_retriggers.card <- function(x) {
+  scores <- x$score
+
+  retriggers <- sapply(
+    scores,
+    \(x) if (inherits(x, "retrigger")) x else 0
+  )
+  is_retrigger <- as.logical(retriggers)
+  ind_not_retrigger <- which(!is_retrigger)
+
+  score_no_retrigger <- scores[ind_not_retrigger]
+  n_retriggers <- sum(unlist(retriggers))
+
+  x$score <- rep(score_no_retrigger, 1 + n_retriggers)
+  return(x)
+}
+
+#' @export
+resolve_retriggers.card_set <- function(x) {
+  add_class(lapply(x, \(x) resolve_retriggers(x)),
+            class_name = "card_set")
+}

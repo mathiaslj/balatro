@@ -112,14 +112,14 @@ balatro <- function(cards,
   trig_ind <- sapply(jokers, \(x) !is.null(attr(x, "card_trigger")))
   reg_jokers <- jokers[!trig_ind]
   trigger_jokers <- jokers[trig_ind]
-  trigger_jokers_order <- retrigger_to_back(trigger_jokers)
 
-  n_trigger <- length(trigger_jokers_order)
+  n_trigger <- length(trigger_jokers)
   if (n_trigger > 0) {
     for (i in 1:n_trigger) {
-      card_set <- add_to_card(card_set, trigger_jokers_order[[i]])
+      card_set <- add_to_card(card_set, trigger_jokers[[i]])
     }
   }
+  card_set <- resolve_retriggers(card_set)
 
   card_set_scores <- sapply(card_set, \(x) x$score)
   scores_to_add <- c(card_set_scores, hand_buffs, reg_jokers)

@@ -36,6 +36,7 @@ card <- function(str,
   score <- list(chips)
   if (!is.null(buff))
     score <- c(score, list(buff))
+  score <- purrr::list_flatten(score)
 
   card <- list(
     score = score,

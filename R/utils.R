@@ -18,9 +18,3 @@ face_to_rank <- function(x) {
     gsub("k", "13", .)
 }
 ace_to_rank <- function(x) gsub("a", "1", x)
-
-retrigger_to_back <- function(list) {
-  retrig_ind <- sapply(list, \(x) inherits(x, "retrigger"))
-  out <- c(list[!retrig_ind], list[retrig_ind])
-  return(out)
-}
