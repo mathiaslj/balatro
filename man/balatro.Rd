@@ -15,7 +15,8 @@ balatro(
 )
 }
 \arguments{
-\item{cards}{a \code{character} vector of card names}
+\item{cards}{a \code{character} vector of card names OR a \code{list} of \code{character}s
+and \code{card}s (see examples)}
 
 \item{base_score}{a \code{balatro_score}}
 
@@ -102,7 +103,7 @@ balatro(base_score = balatro_score(chips = 35, mult = 4),
                       retrigger(2, "first")))
 
 balatro(base_score = balatro_score(chips = 35, mult = 4),
-        cards = c("qc", "9c", "8c", "4c", "2c"),
+        cards = list(card("qc", buff = multx(2)), "9c", "8c", "4c", "2c"),
         jokers = list(idol("qc"),
                       hanging_chad(),
                       walkie_talkie(),

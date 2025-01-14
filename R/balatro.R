@@ -24,7 +24,8 @@
 #' should also just be passed on in this argument
 #'
 #' @param base_score a `balatro_score`
-#' @param cards a `character` vector of card names
+#' @param cards a `character` vector of card names OR a `list` of `character`s
+#' and `card`s (see examples)
 #' @param jokers a `vector` or `list` of calls to `chips`, `multp`
 #' or `multx`
 #' and multx functions
@@ -76,7 +77,7 @@
 #'                       retrigger(2, "first")))
 #'
 #' balatro(base_score = balatro_score(chips = 35, mult = 4),
-#'         cards = c("qc", "9c", "8c", "4c", "2c"),
+#'         cards = list(card("qc", buff = multx(2)), "9c", "8c", "4c", "2c"),
 #'         jokers = list(idol("qc"),
 #'                       hanging_chad(),
 #'                       walkie_talkie(),
@@ -98,7 +99,15 @@ balatro <- function(cards,
     hand_buffs <- purrr::list_flatten(hand_buffs)
   }
 
-  card_set <- debuff(build_card_set(cards), debuff = debuff)
+  if (!inherits(cards, c("character", "list"))) {
+    cli::cli_abort("{.arg cards} but be a character vector or a list")
+  }
+  card_set <- card_set(cards)
+  card_set <- debuff(card_set, debuff = debuff)
+
+  # TODO: Fix so this match.arg works no matter if a string or card_set
+  # is given
+  # cards <- match.arg(cards, choices = deck_format, several.ok = TRUE)
 
   trig_ind <- sapply(jokers, \(x) !is.null(attr(x, "card_trigger")))
   reg_jokers <- jokers[!trig_ind]
