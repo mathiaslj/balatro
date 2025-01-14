@@ -107,5 +107,5 @@ balatro(base_score = balatro_score(chips = 35, mult = 4),
                       hanging_chad(),
                       walkie_talkie(),
                       odd_todd()),
-         hand_buffs = steel(2))
+         hand_buffs = list(steel(2)))
 }

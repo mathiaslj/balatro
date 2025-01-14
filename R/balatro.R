@@ -80,7 +80,8 @@
 #'         jokers = list(idol("qc"),
 #'                       hanging_chad(),
 #'                       walkie_talkie(),
-#'                       odd_todd()))
+#'                       odd_todd()),
+#'          hand_buffs = list(steel(2)))
 balatro <- function(cards,
                     base_score = balatro_score(),
                     jokers = NULL,
@@ -88,26 +89,27 @@ balatro <- function(cards,
                     debuff = NULL,
                     ...,
                     deck_format = build_deck()) {
-  cards <- match.arg(cards, choices = deck_format, several.ok = TRUE)
   if (!is.null(jokers)) {
     checkmate::assert_list(jokers)
     jokers <- purrr::list_flatten(jokers)
   }
   if (!is.null(hand_buffs)) {
     checkmate::assert_list(hand_buffs)
-    hand_buffs <- purrr::list_flatten(jokers)
+    hand_buffs <- purrr::list_flatten(hand_buffs)
   }
 
   card_set <- debuff(build_card_set(cards), debuff = debuff)
 
   trig_ind <- sapply(jokers, \(x) !is.null(attr(x, "card_trigger")))
-  trigger_jokers <- jokers[trig_ind]
   reg_jokers <- jokers[!trig_ind]
+  trigger_jokers <- jokers[trig_ind]
+  retrig_ind <- sapply(trigger_jokers, \(x) inherits(x, "retrigger"))
+  trigger_jokers_order <- c(trigger_jokers[!retrig_ind], trigger_jokers[retrig_ind])
 
-  n_trigger <- length(trigger_jokers)
+  n_trigger <- length(trigger_jokers_order)
   if (n_trigger > 0) {
     for (i in 1:n_trigger) {
-      card_set <- add_to_card(card_set, trigger_jokers[[i]])
+      card_set <- add_to_card(card_set, trigger_jokers_order[[i]])
     }
   }
 
