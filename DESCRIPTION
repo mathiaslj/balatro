@@ -1,6 +1,6 @@
 Package: balatro
 Title: Package for calculating scores in the game Balatro
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person("Mathias Lerbech", "Jeppesen", , "mathiasljeppesen@outlook.com",
            role = c("aut", "cre"))
