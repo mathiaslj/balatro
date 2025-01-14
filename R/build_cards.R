@@ -26,7 +26,7 @@ build_deck <- function(suits = c(spades = "s",
 }
 
 #' @export
-build_card <- function(str,
+card <- function(str,
                        buff = NULL,
                        deck_format = build_deck()) {
 
@@ -49,100 +49,110 @@ build_card <- function(str,
 }
 
 #' @export
-build_card_set <- function(cards,
+card_set <- function(cards,
                            deck_format = build_deck()) {
-  # browser()
-  # if (length(cards == 1)) return(build_card(cards))
+  UseMethod("card_set")
+}
 
-  card_set <- sapply(cards, build_card, simplify = FALSE)
+#' @export
+card_set.character <- function(cards,
+                                     deck_format = build_deck()) {
+
+  card_set <- sapply(cards, card, simplify = FALSE)
   card_set[[1]]$position <- "first"
   structure(card_set, class = c("card_set", "list"))
 }
 
-
-is_debuffed <- function(card, debuff = NULL) {
-  if (is.null(debuff)) return(FALSE)
-  check_type(card, card_trigger = debuff)
+#' @export
+card_set.card <- function(cards,
+                                deck_format = build_deck()) {
+  return(NULL)
 }
 
-#' @export
-debuff <- function(x, debuff = NULL) {
-  UseMethod("debuff")
-}
 
-#' @export
-debuff.card <- function(x, debuff = NULL) {
-  if (is_debuffed(x, debuff = debuff)) {
-    x$score <- chips(0)
-    x$eof <- NULL
-    x$suit <- NULL
+  is_debuffed <- function(card, debuff = NULL) {
+    if (is.null(debuff)) return(FALSE)
+    check_type(card, card_trigger = debuff)
   }
 
-  return(x)
-}
+  #' @export
+  debuff <- function(x, debuff = NULL) {
+    UseMethod("debuff")
+  }
 
-#' @export
-debuff.card_set <- function(x, debuff = NULL) {
-  add_class(lapply(x, \(card) debuff(card, debuff = debuff)),
-            class_name = "card_set")
-}
+  #' @export
+  debuff.card <- function(x, debuff = NULL) {
+    if (is_debuffed(x, debuff = debuff)) {
+      x$score <- chips(0)
+      x$eof <- NULL
+      x$suit <- NULL
+    }
 
-rank <- function(str) {
-  face_and_ace_as_rank <- ace_to_rank(face_to_rank(str))
-  return(extract_digit(face_and_ace_as_rank))
-}
+    return(x)
+  }
 
-#' @export
-even_odd_face <- function(str) {
+  #' @export
+  debuff.card_set <- function(x, debuff = NULL) {
+    add_class(lapply(x, \(card) debuff(card, debuff = debuff)),
+              class_name = "card_set")
+  }
 
-  check_card_format(str = str)
+  rank <- function(str) {
+    face_and_ace_as_rank <- ace_to_rank(face_to_rank(str))
+    return(extract_digit(face_and_ace_as_rank))
+  }
 
-  digit_or_ace <- grepl("^(\\d+|a)", str)
-  if (!digit_or_ace) return("face")
+  #' @export
+  even_odd_face <- function(str) {
 
-  card <- ace_to_chip(str)
-  card_num <- as.numeric(chips(str))
-  if (card_num %% 2 == 0)
-    return("even")
-  return("odd")
-}
+    check_card_format(str = str)
 
-#' @export
-suit_of_card <- function(str,
-                         deck_format = build_deck()) {
+    digit_or_ace <- grepl("^(\\d+|a)", str)
+    if (!digit_or_ace) return("face")
 
-  args <- as.list(environment())
-  do.call(check_card_format, args)
+    card <- ace_to_chip(str)
+    card_num <- as.numeric(chips(str))
+    if (card_num %% 2 == 0)
+      return("even")
+    return("odd")
+  }
 
-  suit_format <- attr(deck_format, "suits")
-  suit_keys <- get_attr_keys(deck_format, "suits")
-  card_suit_key <- gsub(paste0("[^", suit_keys, "]"), "", str)
+  #' @export
+  suit_of_card <- function(str,
+                           deck_format = build_deck()) {
 
-  suit_of_card <- names(suit_format)[suit_format == card_suit_key]
-  return(suit_of_card)
-}
+    args <- as.list(environment())
+    do.call(check_card_format, args)
 
-#' @export
-check_type <- function(card, card_trigger = NULL) {
-  UseMethod("check_type")
-}
+    suit_format <- attr(deck_format, "suits")
+    suit_keys <- get_attr_keys(deck_format, "suits")
+    card_suit_key <- gsub(paste0("[^", suit_keys, "]"), "", str)
 
-#' @export
-check_type.default <- function(card, card_trigger = NULL) {
-  if (is.null(card_trigger)) return(FALSE)
+    suit_of_card <- names(suit_format)[suit_format == card_suit_key]
+    return(suit_of_card)
+  }
 
-  trigger_matches_card <- any(card_trigger %in%
-    c(card$eof, card$suit, card$rank, card$position, card$name))
-  return(trigger_matches_card)
-}
+  #' @export
+  check_type <- function(card, card_trigger = NULL) {
+    UseMethod("check_type")
+  }
 
-#' @export
-check_type.character <- function(card, card_trigger = NULL) {
-  card <- build_card(card)
-  NextMethod("check_type")
-}
+  #' @export
+  check_type.default <- function(card, card_trigger = NULL) {
+    if (is.null(card_trigger)) return(FALSE)
 
-#' #' @export
-#' count_types <- function(cards, card_trigger = NULL) {
-#'   sum(sapply(cards, \(card) check_type(card, card_trigger = card_trigger)))
-#' }
+    trigger_matches_card <- any(card_trigger %in%
+                                  c(card$eof, card$suit, card$rank, card$position, card$name))
+    return(trigger_matches_card)
+  }
+
+  #' @export
+  check_type.character <- function(card, card_trigger = NULL) {
+    card <- card(card)
+    NextMethod("check_type")
+  }
+
+  #' #' @export
+  #' count_types <- function(cards, card_trigger = NULL) {
+  #'   sum(sapply(cards, \(card) check_type(card, card_trigger = card_trigger)))
+  #' }
