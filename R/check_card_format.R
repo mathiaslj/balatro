@@ -7,10 +7,10 @@ get_attr_keys <- function(x, attr_name) {
 # Check if card format is correct
 #' @export
 check_card_format <- function(
-    card,
+    str,
     deck_format = build_deck()) {
 
-  card_str <- match.arg(card, choices = deck_format)
+  card_str <- match.arg(str, choices = deck_format)
 
   suit_keys <- get_attr_keys(deck_format, "suits")
   facecard_keys <- get_attr_keys(deck_format, "face_cards")
@@ -22,9 +22,9 @@ check_card_format <- function(
     ace_key,
     "])[", suit_keys, "]$")
 
-  card_correct_format <- grepl(card_match_regex, card)
+  card_correct_format <- grepl(card_match_regex, str)
   if (!card_correct_format)
-    cli::cli_abort("Provide a card {.var card} of correct format")
+    cli::cli_abort("Provide a card {.var str} of correct format")
 
   return(invisible())
 }
