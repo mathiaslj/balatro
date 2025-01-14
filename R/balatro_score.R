@@ -65,3 +65,12 @@ add_multx <- function(x, balatro_score) {
 add_score.multx <- function(x, balatro_score) {
   add_multx(x, balatro_score)
 }
+
+#' @export
+add_score.list <- function(x, balatro_score) {
+  final_score <- balatro_score
+  for (score in x) {
+    final_score <- add_score(score, final_score)
+  }
+  return(final_score)
+}

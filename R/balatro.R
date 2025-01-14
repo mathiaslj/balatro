@@ -16,7 +16,7 @@
 #' - Chip and mult buffs from cards are added in the order
 #'   1) played cards,
 #'   2) cards held in hand
-#'   - Specify these using `card_buffs` (make sure to order them correctly
+#'   - Specify these using `hand_buffs` (make sure to order them correctly
 #'   according to left to right of played cards and held cards)
 #' - Chip and mult from jokers
 #'   - Specify using `jokers` argument
@@ -30,7 +30,7 @@
 #' and multx functions
 #' @param debuff a `character` specifying what type of cards are debuffed.
 #' Fx. `debuff = "odd"`, `debuff = "hearts"`, etc.
-#' @param card_buffs like `joker` a collection of calls to
+#' @param hand_buffs like `joker` a collection of calls to
 # `chips`, `multp` or `multx` from playing cards and cards in hand
 #' @param ... Nothing for now
 #' @param deck_format the result of a call to `build_deck`. At the moment,
@@ -57,7 +57,7 @@
 #' balatro(base_score = balatro_score(chips = 70, mult = 7),
 #'         cards = c("7d", "7d", "7c"),
 #'         jokers = list(chips(31, card_type = "odd")),
-#'         card_buffs = list(multp(2*4)),
+#'         hand_buffs = list(multp(2*4)),
 #'         debuff = "clubs")
 #'
 #' # Level 14 "five of a kind" with 10s with jokers adding their bonuses
@@ -67,31 +67,45 @@
 #' balatro(base_score = balatro_score(chips = 575, mult = 51),
 #'         cards = c(rep("10d", 4), "10h"),
 #'         jokers = list(multp(118), multx(1.5*2.8*2.2*3*3)),
-#'         card_buffs = list(multx(2^5), multx(1.5^3)))
+#'         hand_buffs = list(multx(2^5), multx(1.5^3)))
+#'
+#' # NEW EXAMPLES
+#' balatro(base_score = balatro_score(chips = 35, mult = 4),
+#'         cards = c("qc", "9c", "8c", "4c", "2c"),
+#'         jokers = list(retrigger(2, "first"), multp(4, c(4, 10))))
+#'
+#'
 #'
 balatro <- function(cards,
                     base_score = balatro_score(),
                     jokers = NULL,
-                    card_buffs = NULL,
+                    hand_buffs = NULL,
                     debuff = NULL,
                     ...,
                     deck_format = build_deck()) {
   cards <- match.arg(cards, choices = deck_format, several.ok = TRUE)
   if (!is.null(jokers)) checkmate::assert_list(jokers)
-  if (!is.null(card_buffs)) checkmate::assert_list(card_buffs)
+  if (!is.null(hand_buffs)) checkmate::assert_list(hand_buffs)
 
   card_set <- debuff(build_card_set(cards), debuff = debuff)
 
-  cards_chip_value <- chip_value(card_set)
-  buff_values <- lapply(card_buffs, \(fun) fun(card_set))
-  joker_values <- lapply(jokers, \(fun) {
-    fun(card_set)
-  })
+  trig_ind <- sapply(jokers, \(x) !is.null(attr(x, "card_trigger")))
+  trigger_jokers <- jokers[trig_ind]
+  reg_jokers <- jokers[!trig_ind]
 
-  scores_to_add <- c(list(cards_chip_value), buff_values, joker_values)
+  n_trigger <- length(trigger_jokers)
+  if (n_trigger > 0) {
+    for (i in 1:n_trigger) {
+      card_set <- add_to_card(card_set, trigger_jokers[[i]])
+    }
+  }
+
+  card_set_scores <- sapply(card_set, \(x) x$score)
+  scores_to_add <- c(card_set_scores, list(hand_buffs), list(reg_jokers))
+  scores_to_add_f <- Filter(\(x) !is.null(x) && length(x) > 0, scores_to_add)
 
   score <- base_score
-  for (k in scores_to_add) {
+  for (k in scores_to_add_f) {
     score <- add_score(k, score)
   }
 

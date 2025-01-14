@@ -8,7 +8,7 @@ balatro(
   cards,
   base_score = balatro_score(),
   jokers = NULL,
-  card_buffs = NULL,
+  hand_buffs = NULL,
   debuff = NULL,
   ...,
   deck_format = build_deck()
@@ -23,7 +23,7 @@ balatro(
 or \code{multx}
 and multx functions}
 
-\item{card_buffs}{like \code{joker} a collection of calls to}
+\item{hand_buffs}{like \code{joker} a collection of calls to}
 
 \item{debuff}{a \code{character} specifying what type of cards are debuffed.
 Fx. \code{debuff = "odd"}, \code{debuff = "hearts"}, etc.}
@@ -55,7 +55,7 @@ Scores are generated in the order of operations:
 \item cards held in hand
 }
 \itemize{
-\item Specify these using \code{card_buffs} (make sure to order them correctly
+\item Specify these using \code{hand_buffs} (make sure to order them correctly
 according to left to right of played cards and held cards)
 }
 \item Chip and mult from jokers
@@ -83,7 +83,7 @@ balatro(base_score = balatro_score(chips = 35, mult = 4),
 balatro(base_score = balatro_score(chips = 70, mult = 7),
         cards = c("7d", "7d", "7c"),
         jokers = list(chips(31, card_type = "odd")),
-        card_buffs = list(multp(2*4)),
+        hand_buffs = list(multp(2*4)),
         debuff = "clubs")
 
 # Level 14 "five of a kind" with 10s with jokers adding their bonuses
@@ -93,6 +93,13 @@ balatro(base_score = balatro_score(chips = 70, mult = 7),
 balatro(base_score = balatro_score(chips = 575, mult = 51),
         cards = c(rep("10d", 4), "10h"),
         jokers = list(multp(118), multx(1.5*2.8*2.2*3*3)),
-        card_buffs = list(multx(2^5), multx(1.5^3)))
+        hand_buffs = list(multx(2^5), multx(1.5^3)))
+
+# NEW EXAMPLES
+balatro(base_score = balatro_score(chips = 35, mult = 4),
+        cards = c("qc", "9c", "8c", "4c", "2c"),
+        jokers = list(retrigger(2, "first"), multp(4, c(4, 10))))
+
+
 
 }

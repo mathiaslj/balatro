@@ -32,32 +32,36 @@ build_card <- function(str,
 
   check_card_format(str, deck_format = deck_format)
 
-  score <- list(chips(str))
+  chips <- chips(str)
+  score <- list(chips)
   if (!is.null(buff))
     score <- c(score, list(buff))
 
   card <- list(
     score = score,
     eof = even_odd_face(str),
-    suit = suit_of_card(str))
+    suit = suit_of_card(str),
+    chip_count = as.numeric(chips),
+    rank = rank(str))
 
   structure(card, class = c("card", "list"))
 }
 
 #' @export
 build_card_set <- function(cards,
-                        deck_format = build_deck()) {
+                           deck_format = build_deck()) {
   # browser()
   # if (length(cards == 1)) return(build_card(cards))
 
   card_set <- sapply(cards, build_card, simplify = FALSE)
+  card_set[[1]]$position <- "first"
   structure(card_set, class = c("card_set", "list"))
 }
 
 
 is_debuffed <- function(card, debuff = NULL) {
   if (is.null(debuff)) return(FALSE)
-  check_type(card, card_type = debuff)
+  check_type(card, card_trigger = debuff)
 }
 
 #' @export
@@ -80,6 +84,11 @@ debuff.card <- function(x, debuff = NULL) {
 debuff.card_set <- function(x, debuff = NULL) {
   add_class(lapply(x, \(card) debuff(card, debuff = debuff)),
             class_name = "card_set")
+}
+
+rank <- function(str) {
+  face_and_ace_as_rank <- ace_to_rank(face_to_rank(str))
+  return(extract_digit(face_and_ace_as_rank))
 }
 
 #' @export
@@ -113,23 +122,26 @@ suit_of_card <- function(str,
 }
 
 #' @export
-check_type <- function(card, card_type = NULL) {
+check_type <- function(card, card_trigger = NULL) {
   UseMethod("check_type")
 }
 
 #' @export
-check_type.default <- function(card, card_type = NULL) {
-  if (is.null(card_type)) return(TRUE)
-  return(card_type %in% c(card$eof, card$suit))
+check_type.default <- function(card, card_trigger = NULL) {
+  if (is.null(card_trigger)) return(FALSE)
+
+  trigger_matches_card <- any(card_trigger %in%
+    c(card$eof, card$suit, card$rank, card$position))
+  return(trigger_matches_card)
 }
 
 #' @export
-check_type.character <- function(card, card_type = NULL) {
+check_type.character <- function(card, card_trigger = NULL) {
   card <- build_card(card)
   NextMethod("check_type")
 }
 
 #' #' @export
-#' count_types <- function(cards, card_type = NULL) {
-#'   sum(sapply(cards, \(card) check_type(card, card_type = card_type)))
+#' count_types <- function(cards, card_trigger = NULL) {
+#'   sum(sapply(cards, \(card) check_type(card, card_trigger = card_trigger)))
 #' }
