@@ -29,9 +29,16 @@ score_class.default <- function(x, class, card_trigger = NULL,
   score <- structure(add_class(x, class_name = class),
                      card_trigger = card_trigger)
 
-  if (foil) score <- list(score, chips(50))
-  if (holographic) score <- list(score, multp(10))
-  if (polychrome) score <- list(score, multx(1.5))
+  if (any(c(foil, holographic, polychrome))) {
+    score <- list(
+      score,
+      foil_holo_poly(
+        foil = foil,
+        holographic = holographic,
+        polychrome = polychrome
+      )
+    )
+  }
 
   return(score)
 }
