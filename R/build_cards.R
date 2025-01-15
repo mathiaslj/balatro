@@ -28,21 +28,40 @@ build_deck <- function(suits = c(spades = "s",
 #' @export
 card <- function(str,
                  buff = NULL,
+                 red_seal = FALSE,
+                 foil = FALSE, holographic = FALSE,
+                 polychrome = FALSE,
                  deck_format = build_deck()) {
 
   check_card_format(str, deck_format = deck_format)
 
-  chips <- chips(str)
-  score <- list(chips)
-  if (!is.null(buff))
-    score <- c(score, list(buff))
+  score <- list(chips(str))
+
+  if (is.null(buff))
+    buff_list <- list()
+  else
+    buff_list <- list(buff)
+
+  if (any(c(red_seal, foil, holographic, polychrome))){
+    if (any(c(foil, holographic, polychrome))) {
+      buff_list <- c(buff_list, list(
+        foil_holo_poly(foil, holographic, polychrome)
+      ))
+    }
+    if (red_seal) {
+      buff_list <- c(buff_list, list(retrigger(1)))
+    }
+  }
+
+  any_buffs <- length(buff_list) > 0
+  if (any_buffs)
+    score <- c(score, buff_list)
   score <- purrr::list_flatten(score)
 
   card <- list(
     score = score,
     eof = even_odd_face(str),
     suit = suit_of_card(str),
-    chip_count = as.numeric(chips),
     rank = rank(str),
     name = str)
 
@@ -137,8 +156,9 @@ check_type <- function(card, card_trigger = NULL) {
 check_type.default <- function(card, card_trigger = NULL) {
   if (is.null(card_trigger)) return(FALSE)
 
-  trigger_matches_card <- any(card_trigger %in%
-                                c(card$eof, card$suit, card$rank, card$position, card$name))
+  trigger_matches_card <- any(
+    card_trigger %in%
+      c(card$eof, card$suit, card$rank, card$position, card$name))
   return(trigger_matches_card)
 }
 
