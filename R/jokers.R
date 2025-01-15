@@ -9,23 +9,28 @@
 #   multp(mult)
 # }
 
-steel <- function(n = 1) {
-  multx(1.5^n)
+steel <- function(n = 1, red_seals = 0) {
+  multx(1.5^(n+red_seals))
 }
 
-odd_todd <- function() {
-  chips(31, card_trigger = "odd")
+baron <- function(n_kings = 1, red_seals = 0) {
+  steel(n_kings, red_seals)
 }
 
-hanging_chad <- function() {
-  retrigger(2, "first")
+odd_todd <- function(...) {
+  chips(31, card_trigger = "odd", ...)
 }
 
-walkie_talkie <- function() {
-  list(chips(10, card_trigger = c(4,10)),
+hanging_chad <- function(...) {
+  retrigger(2, "first", ...)
+}
+
+walkie_talkie <- function(...) {
+  list(chips(10, card_trigger = c(4,10), ...),
        multp(4, card_trigger = c(4,10)))
 }
 
-idol <- function(str) {
-  multx(2, card_trigger = str)
+# fx idol("2h")
+idol <- function(str, ...) {
+  multx(2, card_trigger = str, ...)
 }
