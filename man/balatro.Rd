@@ -102,7 +102,8 @@ balatro(base_score = balatro_score(chips = 35, mult = 4),
                       retrigger(2, "first")))
 
 balatro(base_score = balatro_score(chips = 35, mult = 4),
-        cards = list(card("qc", buff = list(multx(2), retrigger(1))),
+        cards = list(card("qc", buff = list(multx(2)),
+                          red_seal = TRUE, holographic = TRUE),
                      "9c", "8c", "4c", "2c"),
         jokers = list(idol("qc", polychrome = TRUE),
                       hanging_chad(holographic = TRUE),
