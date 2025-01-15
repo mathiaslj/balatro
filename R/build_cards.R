@@ -26,62 +26,68 @@ build_deck <- function(suits = c(spades = "s",
 }
 
 #' @export
-build_card <- function(str,
-                       deck_format = build_deck()) {
+card <- function(str,
+                 buff = NULL,
+                 red_seal = FALSE,
+                 foil = FALSE, holographic = FALSE,
+                 polychrome = FALSE,
+                 deck_format = build_deck()) {
 
-  check_card_format(card = str, deck_format = deck_format)
+  check_card_format(str, deck_format = deck_format)
+
+  score <- list(chips(str))
+
+  if (is.null(buff))
+    buff_list <- list()
+  else
+    buff_list <- list(buff)
+
+  if (any(c(red_seal, foil, holographic, polychrome))){
+    if (any(c(foil, holographic, polychrome))) {
+      buff_list <- c(buff_list, list(
+        foil_holo_poly(foil, holographic, polychrome)
+      ))
+    }
+    if (red_seal) {
+      buff_list <- c(buff_list, list(retrigger(1)))
+    }
+  }
+
+  any_buffs <- length(buff_list) > 0
+  if (any_buffs)
+    score <- c(score, buff_list)
+  score <- purrr::list_flatten(score)
 
   card <- list(
-    chip_value = chip_value(str),
+    score = score,
     eof = even_odd_face(str),
-    suit = suit_of_card(str))
+    suit = suit_of_card(str),
+    rank = rank(str),
+    name = str)
 
   structure(card, class = c("card", "list"))
 }
 
 #' @export
-build_card_set <- function(cards,
-                        deck_format = build_deck()) {
-  # browser()
-  # if (length(cards == 1)) return(build_card(cards))
+card_set <- function(cards,
+                     deck_format = build_deck()) {
+  checkmate::assert_list(cards)
 
-  card_set <- sapply(cards, build_card, simplify = FALSE)
+  card_set <- sapply(
+    cards,
+    \(card) {
+      if (inherits(card, "card")) return(card)
+      card(card)
+    },
+    simplify = FALSE
+  )
+  card_set[[1]]$position <- "first"
   structure(card_set, class = c("card_set", "list"))
-}
-
-# Transform face cards and ace to numeric chip value
-extract_digit <- function(str) {
-  as.numeric(gsub("\\D", "", str))
-}
-
-face_to_chip <- function(x) gsub("[jqk]", "10", x)
-ace_to_chip <- function(x) gsub("a", "11", x)
-
-#' @export
-chip_value <- function(x, ...) {
-  UseMethod("chip_value", object = x)
-}
-
-#' @export
-chip_value.default <- function(x, ...) {
-  face_and_ace_as_num <- ace_to_chip(face_to_chip(x))
-  add_class(extract_digit(face_and_ace_as_num), class_name = "chips")
-}
-
-#' @export
-chip_value.card <- function(x, ...) {
-  return(x$chip_value)
-}
-
-#' @export
-chip_value.card_set <- function(x, ...) {
-  add_class(sum(sapply(x, \(card) chip_value(card))),
-            class_name = "chips")
 }
 
 is_debuffed <- function(card, debuff = NULL) {
   if (is.null(debuff)) return(FALSE)
-  check_type(card, card_type = debuff)
+  check_type(card, card_trigger = debuff)
 }
 
 #' @export
@@ -92,7 +98,7 @@ debuff <- function(x, debuff = NULL) {
 #' @export
 debuff.card <- function(x, debuff = NULL) {
   if (is_debuffed(x, debuff = debuff)) {
-    x$chip_value <- 0
+    x$score <- list(chips(0))
     x$eof <- NULL
     x$suit <- NULL
   }
@@ -106,24 +112,28 @@ debuff.card_set <- function(x, debuff = NULL) {
             class_name = "card_set")
 }
 
+rank <- function(str) {
+  face_and_ace_as_rank <- ace_to_rank(face_to_rank(str))
+  return(extract_digit(face_and_ace_as_rank))
+}
+
 #' @export
-even_odd_face <- function(card) {
+even_odd_face <- function(str) {
 
-  args <- as.list(environment())
-  do.call(check_card_format, args)
+  check_card_format(str)
 
-  digit_or_ace <- grepl("^(\\d+|a)", card)
+  digit_or_ace <- grepl("^(\\d+|a)", str)
   if (!digit_or_ace) return("face")
 
-  card <- ace_to_chip(card)
-  card_num <- chip_value(card)
+  card <- ace_to_chip(str)
+  card_num <- as.numeric(chips(str))
   if (card_num %% 2 == 0)
     return("even")
   return("odd")
 }
 
 #' @export
-suit_of_card <- function(card,
+suit_of_card <- function(str,
                          deck_format = build_deck()) {
 
   args <- as.list(environment())
@@ -131,35 +141,34 @@ suit_of_card <- function(card,
 
   suit_format <- attr(deck_format, "suits")
   suit_keys <- get_attr_keys(deck_format, "suits")
-  card_suit_key <- gsub(paste0("[^", suit_keys, "]"), "", card)
+  card_suit_key <- gsub(paste0("[^", suit_keys, "]"), "", str)
 
   suit_of_card <- names(suit_format)[suit_format == card_suit_key]
   return(suit_of_card)
 }
 
 #' @export
-check_type <- function(card, card_type = NULL) {
+check_type <- function(card, card_trigger = NULL) {
   UseMethod("check_type")
 }
 
 #' @export
-check_type.default <- function(card, card_type = NULL) {
-  if (is.null(card_type)) return(TRUE)
-  return(card_type %in% c(card$eof, card$suit))
+check_type.default <- function(card, card_trigger = NULL) {
+  if (is.null(card_trigger)) return(FALSE)
+
+  trigger_matches_card <- any(
+    card_trigger %in%
+      c(card$eof, card$suit, card$rank, card$position, card$name))
+  return(trigger_matches_card)
 }
 
 #' @export
-check_type.character <- function(card, card_type = NULL) {
-  card <- build_card(card)
+check_type.character <- function(card, card_trigger = NULL) {
+  card <- card(card)
   NextMethod("check_type")
 }
 
-#' @export
-count_types <- function(cards, card_type = NULL) {
-  UseMethod("count_types")
-}
-
-#' @export
-count_types.default <- function(cards, card_type = NULL) {
-  sum(sapply(cards, \(card) check_type(card, card_type = card_type)))
-}
+#' #' @export
+#' count_types <- function(cards, card_trigger = NULL) {
+#'   sum(sapply(cards, \(card) check_type(card, card_trigger = card_trigger)))
+#' }
