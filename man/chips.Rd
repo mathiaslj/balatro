@@ -7,7 +7,13 @@ chip_value.card <- function(x, ...) {
 return(x$chip_value)
 }}
 \usage{
-chips(x, card_trigger = NULL)
+chips(
+  x,
+  card_trigger = NULL,
+  foil = FALSE,
+  holographic = FALSE,
+  polychrome = FALSE
+)
 }
 \description{
 #' @export

@@ -104,9 +104,9 @@ balatro(base_score = balatro_score(chips = 35, mult = 4),
 balatro(base_score = balatro_score(chips = 35, mult = 4),
         cards = list(card("qc", buff = list(multx(2), retrigger(1))),
                      "9c", "8c", "4c", "2c"),
-        jokers = list(idol("qc"),
-                      hanging_chad(),
-                      walkie_talkie(),
+        jokers = list(idol("qc", polychrome = TRUE),
+                      hanging_chad(holographic = TRUE),
+                      walkie_talkie(foil = TRUE),
                       odd_todd()),
          hand_buffs = list(steel(2)))
 }

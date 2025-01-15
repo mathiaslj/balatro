@@ -16,18 +16,30 @@ score_fun <- function(x, score_type, card_trigger = NULL) {
 
 #### NEW
 #' @export
-score_class <- function(x, class, card_trigger = NULL) {
+score_class <- function(x, class, card_trigger = NULL,
+                        foil = FALSE, holographic = FALSE,
+                        polychrome = FALSE) {
   UseMethod("score_class")
 }
 
 #' @export
-score_class.default <- function(x, class, card_trigger = NULL) {
-  structure(add_class(x, class_name = class),
-            card_trigger = card_trigger)
+score_class.default <- function(x, class, card_trigger = NULL,
+                                foil = FALSE, holographic = FALSE,
+                                polychrome = FALSE) {
+  score <- structure(add_class(x, class_name = class),
+                     card_trigger = card_trigger)
+
+  if (foil) score <- list(score, chips(50))
+  if (holographic) score <- list(score, multp(10))
+  if (polychrome) score <- list(score, multx(1.5))
+
+  return(score)
 }
 
 #' @export
-score_class.character <- function(x, class, card_trigger = NULL) {
+score_class.character <- function(x, class, card_trigger = NULL,
+                                  foil = FALSE, holographic = FALSE,
+                                  polychrome = FALSE) {
   face_and_ace_as_num <- ace_to_chip(face_to_chip(x))
   x <- extract_digit(face_and_ace_as_num)
   NextMethod("score_class")
@@ -49,8 +61,11 @@ score_class.character <- function(x, class, card_trigger = NULL) {
 #   score_fun(x, "chips", card_trigger = card_trigger)
 # }
 
-chips <- function(x, card_trigger = NULL) {
-  score_class(x, class = "chips", card_trigger = card_trigger)
+chips <- function(x, card_trigger = NULL,
+                  foil = FALSE, holographic = FALSE,
+                  polychrome = FALSE) {
+  args <- as.list(environment())
+  do.call(score_class, c(list(class = "chips"), args))
 }
 
 # Mult plus
@@ -59,8 +74,11 @@ chips <- function(x, card_trigger = NULL) {
 #   score_fun(x, "multp", card_trigger = card_trigger)
 # }
 
-multp <- function(x, card_trigger = NULL) {
-  score_class(x, class = "multp", card_trigger = card_trigger)
+multp <- function(x, card_trigger = NULL,
+                  foil = FALSE, holographic = FALSE,
+                  polychrome = FALSE) {
+  args <- as.list(environment())
+  do.call(score_class, c(list(class = "multp"), args))
 }
 
 # Mult x
@@ -69,13 +87,19 @@ multp <- function(x, card_trigger = NULL) {
 #   score_fun(x, "multx", card_trigger = card_trigger)
 # }
 
-multx <- function(x, card_trigger = NULL) {
-  score_class(x, class = "multx", card_trigger = card_trigger)
+multx <- function(x, card_trigger = NULL,
+                  foil = FALSE, holographic = FALSE,
+                  polychrome = FALSE) {
+  args <- as.list(environment())
+  do.call(score_class, c(list(class = "multx"), args))
 }
 
 #' @export
-retrigger <- function(x, card_trigger = NULL) {
-  score_class(x, class = "retrigger", card_trigger = card_trigger)
+retrigger <- function(x, card_trigger = NULL,
+                      foil = FALSE, holographic = FALSE,
+                      polychrome = FALSE) {
+  args <- as.list(environment())
+  do.call(score_class, c(list(class = "retrigger"), args))
 }
 
 
